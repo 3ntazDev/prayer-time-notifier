@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prayer Time Notifier</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      color: #e0e0e0;
+      width: 320px;
+      min-height: 420px;
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .header .icon {
+      font-size: 48px;
+      display: block;
+      margin-bottom: 8px;
+      filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
+    }
+
+    .header h1 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #ffd700;
+      letter-spacing: 0.5px;
+    }
+
+    .header p {
+      font-size: 12px;
+      color: #a0aec0;
+      margin-top: 4px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      color: #a0aec0;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 215, 0, 0.3);
+      background: rgba(0, 0, 0, 0.4);
+      color: #e0e0e0;
+      font-size: 14px;
+      font-family: inherit;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffd700' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: left 12px center;
+      padding-left: 32px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    select:focus {
+      border-color: #ffd700;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      background: linear-gradient(135deg, #ffd700, #f6a623);
+      color: #1a1a2e;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      margin-top: 4px;
+    }
+
+    button:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    #status {
+      font-size: 12px;
+      text-align: center;
+      min-height: 20px;
+      margin-top: 8px;
+      border-radius: 6px;
+      padding: 6px 10px;
+      transition: all 0.3s;
+    }
+
+    #status.success {
+      background: rgba(72, 187, 120, 0.15);
+      color: #68d391;
+      border: 1px solid rgba(72, 187, 120, 0.3);
+    }
+
+    #status.error {
+      background: rgba(245, 101, 101, 0.15);
+      color: #fc8181;
+      border: 1px solid rgba(245, 101, 101, 0.3);
+    }
+
+    #status.info {
+      background: rgba(99, 179, 237, 0.15);
+      color: #90cdf4;
+      border: 1px solid rgba(99, 179, 237, 0.3);
+    }
+
+    .timings-section {
+      display: none;
+    }
+
+    .timings-section.visible {
+      display: block;
+    }
+
+    .timings-section h2 {
+      font-size: 13px;
+      color: #ffd700;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .prayer-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 13px;
+    }
+
+    .prayer-row:last-child {
+      border-bottom: none;
+    }
+
+    .prayer-name {
+      color: #e0e0e0;
+      font-weight: 600;
+    }
+
+    .prayer-time {
+      color: #ffd700;
+      font-weight: 700;
+      direction: ltr;
+    }
+
+    .refresh-btn {
+      background: rgba(255, 255, 255, 0.08);
+      color: #a0aec0;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 8px;
+      padding: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .refresh-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #e0e0e0;
+    }
+
+    .current-city {
+      font-size: 11px;
+      color: #718096;
+      text-align: center;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <span class="icon">🕌</span>
+    <h1>مواقيت الصلاة</h1>
+    <p>Prayer Time Notifier</p>
+  </div>
+
+  <!-- City Selection -->
+  <div class="card" id="city-card">
+    <label for="citySelect">📍 اختر مدينتك</label>
+    <select id="citySelect">
+      <option value="">-- اختر المدينة --</option>
+      <optgroup label="🇸🇦 المملكة العربية السعودية">
+        <option value="Riyadh|SA">الرياض</option>
+        <option value="Jeddah|SA">جدة</option>
+        <option value="Mecca|SA">مكة المكرمة</option>
+        <option value="Medina|SA">المدينة المنورة</option>
+        <option value="Dammam|SA">الدمام</option>
+        <option value="Khobar|SA">الخبر</option>
+        <option value="Tabuk|SA">تبوك</option>
+        <option value="Abha|SA">أبها</option>
+      </optgroup>
+      <optgroup label="🇦🇪 الإمارات">
+        <option value="Dubai|AE">دبي</option>
+        <option value="Abu Dhabi|AE">أبوظبي</option>
+        <option value="Sharjah|AE">الشارقة</option>
+      </optgroup>
+      <optgroup label="🇶🇦 قطر">
+        <option value="Doha|QA">الدوحة</option>
+      </optgroup>
+      <optgroup label="🇰🇼 الكويت">
+        <option value="Kuwait City|KW">الكويت</option>
+      </optgroup>
+      <optgroup label="🇧🇭 البحرين">
+        <option value="Manama|BH">المنامة</option>
+      </optgroup>
+      <optgroup label="🇴🇲 عمان">
+        <option value="Muscat|OM">مسقط</option>
+      </optgroup>
+      <optgroup label="🇪🇬 مصر">
+        <option value="Cairo|EG">القاهرة</option>
+        <option value="Alexandria|EG">الإسكندرية</option>
+      </optgroup>
+      <optgroup label="🇯🇴 الأردن">
+        <option value="Amman|JO">عمان</option>
+      </optgroup>
+      <optgroup label="🇱🇧 لبنان">
+        <option value="Beirut|LB">بيروت</option>
+      </optgroup>
+      <optgroup label="🇮🇶 العراق">
+        <option value="Baghdad|IQ">بغداد</option>
+      </optgroup>
+      <optgroup label="🇸🇾 سوريا">
+        <option value="Damascus|SY">دمشق</option>
+      </optgroup>
+      <optgroup label="🇾🇪 اليمن">
+        <option value="Sanaa|YE">صنعاء</option>
+      </optgroup>
+      <optgroup label="🇲🇦 المغرب">
+        <option value="Casablanca|MA">الدار البيضاء</option>
+        <option value="Rabat|MA">الرباط</option>
+      </optgroup>
+      <optgroup label="🇩🇿 الجزائر">
+        <option value="Algiers|DZ">الجزائر</option>
+      </optgroup>
+      <optgroup label="🇹🇳 تونس">
+        <option value="Tunis|TN">تونس</option>
+      </optgroup>
+      <optgroup label="🇱🇾 ليبيا">
+        <option value="Tripoli|LY">طرابلس</option>
+      </optgroup>
+      <optgroup label="🇸🇩 السودان">
+        <option value="Khartoum|SD">الخرطوم</option>
+      </optgroup>
+      <optgroup label="🇵🇰 باكستان">
+        <option value="Karachi|PK">كراتشي</option>
+        <option value="Lahore|PK">لاهور</option>
+        <option value="Islamabad|PK">إسلام آباد</option>
+      </optgroup>
+      <optgroup label="🇹🇷 تركيا">
+        <option value="Istanbul|TR">إسطنبول</option>
+        <option value="Ankara|TR">أنقرة</option>
+      </optgroup>
+      <optgroup label="🇲🇾 ماليزيا">
+        <option value="Kuala Lumpur|MY">كوالالمبور</option>
+      </optgroup>
+      <optgroup label="🇮🇩 إندونيسيا">
+        <option value="Jakarta|ID">جاكرتا</option>
+      </optgroup>
+      <optgroup label="🌍 أوروبا">
+        <option value="London|GB">لندن</option>
+        <option value="Paris|FR">باريس</option>
+        <option value="Berlin|DE">برلين</option>
+      </optgroup>
+      <optgroup label="🌎 أمريكا الشمالية">
+        <option value="New York|US">نيويورك</option>
+        <option value="Los Angeles|US">لوس أنجلوس</option>
+        <option value="Toronto|CA">تورنتو</option>
+      </optgroup>
+    </select>
+
+    <br />
+    <button id="saveBtn" disabled>✅ حفظ وتفعيل التنبيهات</button>
+    <div id="status"></div>
+  </div>
+
+  <!-- Prayer Timings Display -->
+  <div class="card timings-section" id="timings-section">
+    <h2>🕐 أوقات الصلاة اليوم</h2>
+    <div id="timings-list"></div>
+    <p class="current-city" id="current-city-label"></p>
+    <button class="refresh-btn" id="refreshBtn">🔄 تحديث الأوقات</button>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

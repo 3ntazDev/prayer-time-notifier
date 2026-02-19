@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Prayer Time Notifier",
+  "version": "1.0",
+  "description": "تنبيهات أوقات الصلاة",
+  "permissions": [
+    "storage",
+    "alarms",
+    "notifications"
+  ],
+  "host_permissions": [
+    "https://api.aladhan.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Prayer Time Notifier"
+  }
+}
